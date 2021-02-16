@@ -8,13 +8,13 @@ import (
 	"google.golang.org/grpc"
 )
 
-func getUserIntClient() pb.UserIntClient {
+func getUserIntClient() pb.BusinessIntClient {
 	conn, err := grpc.Dial("localhost:50300", grpc.WithInsecure())
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
-	return pb.NewUserIntClient(conn)
+	return pb.NewBusinessIntClient(conn)
 }
 
 func TestUserIntServer_Auth(t *testing.T) {

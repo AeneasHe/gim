@@ -18,8 +18,8 @@ func TestGroupUserCache_Set(t *testing.T) {
 		{
 			UserId:  1,
 			GroupId: 0,
-			Label:   "2",
-			Extra:   "2",
+			// Label:   "2",
+			Extra: "2",
 		},
 	}))
 }

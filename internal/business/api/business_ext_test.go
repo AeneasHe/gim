@@ -12,13 +12,13 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-func getUserExtClient() pb.UserExtClient {
+func getUserExtClient() pb.BusinessExtClient {
 	conn, err := grpc.Dial("127.0.0.1:50301", grpc.WithInsecure())
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
-	return pb.NewUserExtClient(conn)
+	return pb.NewBusinessExtClient(conn)
 }
 
 func getCtx() context.Context {

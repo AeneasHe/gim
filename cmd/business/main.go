@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"gim/config"
 	"gim/internal/business/api"
 	"gim/pkg/db"
@@ -10,6 +11,7 @@ import (
 
 func main() {
 	logger.Init()
+	fmt.Println(config.Business.MySQL)
 	db.InitMysql(config.Business.MySQL)
 	db.InitRedis(config.Business.RedisIP, config.Logic.RedisPassword)
 

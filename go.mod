@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/alberliu/gn v1.5.1
+	github.com/cofepy/gn v0.0.0-20210216083232-8b61be97ff2e
 	github.com/denisenkom/go-mssqldb v0.0.0-20200620013148-b91950f658ec // indirect
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-redis/redis v6.14.2+incompatible

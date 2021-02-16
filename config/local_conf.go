@@ -7,17 +7,19 @@ import (
 )
 
 func initLocalConf() {
+	// 逻辑层
 	Logic = LogicConf{
-		MySQL:            "root:liu123456@tcp(localhost:3306)/gim?charset=utf8&parseTime=true&loc=Local",
+		MySQL:            "root:root123@tcp(localhost:3306)/gim?charset=utf8&parseTime=true&loc=Local",
 		NSQIP:            "127.0.0.1:4150",
 		RedisIP:          "127.0.0.1:6379",
-		RedisPassword:    "liu123456",
+		RedisPassword:    "",
 		RPCIntListenAddr: ":50000",
 		RPCExtListenAddr: ":50001",
 		ConnRPCAddrs:     "addrs:///127.0.0.1:50100,127.0.0.1:50200",
 		BusinessRPCAddrs: "addrs:///127.0.0.1:50300",
 	}
 
+	// TCP通讯层
 	TCPConn = TCPConnConf{
 		TCPListenAddr: 8080,
 		RPCListenAddr: ":50100",
@@ -25,6 +27,7 @@ func initLocalConf() {
 		LogicRPCAddrs: "addrs:///127.0.0.1:50000",
 	}
 
+	// WS同学层
 	WSConn = WSConnConf{
 		WSListenAddr:  ":8081",
 		RPCListenAddr: ":50200",
@@ -32,8 +35,9 @@ func initLocalConf() {
 		LogicRPCAddrs: "addrs:///127.0.0.1:50000",
 	}
 
+	// 业务层
 	Business = BusinessConf{
-		MySQL:            "root:liu123456@tcp(localhost:3306)/im?charset=utf8&parseTime=true",
+		MySQL:            "root:root123@tcp(localhost:3306)/im?charset=utf8&parseTime=true",
 		NSQIP:            "127.0.0.1:4150",
 		RedisIP:          "127.0.0.1:6379",
 		RPCIntListenAddr: ":50300",

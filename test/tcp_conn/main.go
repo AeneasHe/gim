@@ -14,6 +14,7 @@ import (
 
 func main() {
 	client := TcpClient{}
+	// 输入用户id，设备id
 	fmt.Println("input UserId,DeviceId,SyncSequence")
 	fmt.Scanf("%d %d %d", &client.UserId, &client.DeviceId, &client.Seq)
 	client.Start()
@@ -25,11 +26,28 @@ func Json(i interface{}) string {
 	return string(bytes)
 }
 
+// Tcp客户端
 type TcpClient struct {
 	UserId   int64
 	DeviceId int64
 	Seq      int64
 	codec    *util2.Codec
+}
+
+// 客户端启动，入口
+func (c *TcpClient) Start() {
+	connect, err := net.Dial("tcp", "localhost:8080")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	c.codec = util2.NewCodec(connect)
+
+	c.SignIn()
+	c.SyncTrigger()
+	go c.Heartbeat()
+	go c.Receive()
 }
 
 func (c *TcpClient) Output(pt pb.PackageType, requestId int64, message proto.Message) {
@@ -58,22 +76,6 @@ func (c *TcpClient) Output(pt pb.PackageType, requestId int64, message proto.Mes
 		fmt.Println(err)
 	}
 }
-
-func (c *TcpClient) Start() {
-	connect, err := net.Dial("tcp", "localhost:8080")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	c.codec = util2.NewCodec(connect)
-
-	c.SignIn()
-	c.SyncTrigger()
-	go c.Heartbeat()
-	go c.Receive()
-}
-
 func (c *TcpClient) SignIn() {
 	signIn := pb.SignInInput{
 		UserId:   c.UserId,
