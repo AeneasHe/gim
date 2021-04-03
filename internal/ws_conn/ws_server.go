@@ -3,6 +3,7 @@ package ws_conn
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"gim/config"
 	"gim/pkg/gerrors"
 	"gim/pkg/grpclib"
@@ -31,7 +32,10 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	token := r.FormValue(grpclib.CtxToken)
 	requestId, _ := strconv.ParseInt(r.FormValue(grpclib.CtxRequestId), 10, 64)
 
+	fmt.Println("========> auth2")
+
 	if userId == 0 || deviceId == 0 || token == "" {
+		fmt.Println("========> auth2.0")
 		s, _ := status.FromError(gerrors.ErrUnauthorized)
 		bytes, err := json.Marshal(s.Proto())
 		if err != nil {

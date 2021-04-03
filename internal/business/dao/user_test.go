@@ -14,7 +14,7 @@ func init() {
 
 func TestUserDao_Add(t *testing.T) {
 	id, err := UserDao.Add(model.User{
-		PhoneNumber: "18829291351",
+		PhoneNumber: "18800001111",
 		Nickname:    "Alber",
 		Sex:         1,
 		AvatarUrl:   "AvatarUrl",
@@ -34,7 +34,7 @@ func TestUserDao_GetByIds(t *testing.T) {
 }
 
 func TestUserDao_GetByPhoneNumber(t *testing.T) {
-	user, err := UserDao.GetByPhoneNumber("18829291351")
+	user, err := UserDao.GetByPhoneNumber("18800001111")
 	fmt.Printf("%+v\n %+v\n ", user, err)
 }
 

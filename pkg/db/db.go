@@ -47,6 +47,8 @@ func InitRedis(addr, password string) {
 
 // InitByTest 初始化数据库配置，仅用在单元测试
 func InitByTest() {
+	logger.Init()
+
 	InitMysql(config.Logic.MySQL)
 	InitRedis(config.Logic.RedisIP, config.Logic.RedisPassword)
 }

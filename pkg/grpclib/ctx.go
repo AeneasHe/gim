@@ -2,6 +2,7 @@ package grpclib
 
 import (
 	"context"
+	"fmt"
 	"gim/pkg/gerrors"
 	"gim/pkg/logger"
 	"strconv"
@@ -42,6 +43,7 @@ func GetCtxRequstId(ctx context.Context) int64 {
 func GetCtxData(ctx context.Context) (int64, int64, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
+		fmt.Println("========> auth3.1")
 		return 0, 0, gerrors.ErrUnauthorized
 	}
 
@@ -53,21 +55,29 @@ func GetCtxData(ctx context.Context) (int64, int64, error) {
 
 	userIdStrs, ok := md[CtxUserId]
 	if !ok && len(userIdStrs) == 0 {
+		fmt.Println("========> auth3.2")
+
 		return 0, 0, gerrors.ErrUnauthorized
 	}
 	userId, err = strconv.ParseInt(userIdStrs[0], 10, 64)
 	if err != nil {
 		logger.Sugar.Error(err)
+		fmt.Println("========> auth3.3")
+
 		return 0, 0, gerrors.ErrUnauthorized
 	}
 
 	deviceIdStrs, ok := md[CtxDeviceId]
 	if !ok && len(deviceIdStrs) == 0 {
+		fmt.Println("========> auth3.4")
+
 		return 0, 0, gerrors.ErrUnauthorized
 	}
 	deviceId, err = strconv.ParseInt(deviceIdStrs[0], 10, 64)
 	if err != nil {
 		logger.Sugar.Error(err)
+		fmt.Println("========> auth3.5")
+
 		return 0, 0, gerrors.ErrUnauthorized
 	}
 	return userId, deviceId, nil
@@ -77,16 +87,22 @@ func GetCtxData(ctx context.Context) (int64, int64, error) {
 func GetCtxDeviceId(ctx context.Context) (int64, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
+		fmt.Println("========> auth3.6")
+
 		return 0, gerrors.ErrUnauthorized
 	}
 
 	deviceIdStrs, ok := md[CtxDeviceId]
 	if !ok && len(deviceIdStrs) == 0 {
+		fmt.Println("========> auth3.7")
+
 		return 0, gerrors.ErrUnauthorized
 	}
 	deviceId, err := strconv.ParseInt(deviceIdStrs[0], 10, 64)
 	if err != nil {
 		logger.Sugar.Error(err)
+		fmt.Println("========> auth3.8")
+
 		return 0, gerrors.ErrUnauthorized
 	}
 	return deviceId, nil
@@ -96,11 +112,15 @@ func GetCtxDeviceId(ctx context.Context) (int64, error) {
 func GetCtxToken(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
+		fmt.Println("========> auth3.9")
+
 		return "", gerrors.ErrUnauthorized
 	}
 
 	tokens, ok := md[CtxToken]
 	if !ok && len(tokens) == 0 {
+		fmt.Println("========> auth3.10")
+
 		return "", gerrors.ErrUnauthorized
 	}
 

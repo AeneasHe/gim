@@ -14,8 +14,9 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+// 获取客户端
 func getLogicExtClient() pb.LogicExtClient {
-	conn, err := grpc.Dial("112.126.102.84:50001", grpc.WithInsecure())
+	conn, err := grpc.Dial("127.0.0.1:50001", grpc.WithInsecure())
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -23,15 +24,17 @@ func getLogicExtClient() pb.LogicExtClient {
 	return pb.NewLogicExtClient(conn)
 }
 
+// 上下文，即登录的身份，设备，token等信息
 func getCtx() context.Context {
 	token := "0"
 	return metadata.NewOutgoingContext(context.TODO(), metadata.Pairs(
 		"user_id", "2",
-		"device_id", "1",
+		"device_id", "2",
 		"token", token,
 		"request_id", strconv.FormatInt(time.Now().UnixNano(), 10)))
 }
 
+// 测试注册设备
 func TestLogicExtServer_RegisterDevice(t *testing.T) {
 	resp, err := getLogicExtClient().RegisterDevice(context.TODO(),
 		&pb.RegisterDeviceReq{
@@ -48,18 +51,20 @@ func TestLogicExtServer_RegisterDevice(t *testing.T) {
 	fmt.Printf("%+v\n", resp)
 }
 
+// 测试发送消息
 func TestLogicExtServer_SendMessage(t *testing.T) {
 	buf, err := proto.Marshal(&pb.Text{
-		Text: "hello alber ",
+		Text: "hello alber 4",
 	})
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+	// 用getCtx()得到的身份2，给身份1的用户发送消息
 	resp, err := getLogicExtClient().SendMessage(getCtx(),
 		&pb.SendMessageReq{
 			ReceiverType:   pb.ReceiverType_RT_USER,
-			ReceiverId:     1,
+			ReceiverId:     1, // 消息接收者，身份1
 			ToUserIds:      nil,
 			MessageType:    pb.MessageType_MT_TEXT,
 			MessageContent: buf,

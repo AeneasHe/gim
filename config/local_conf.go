@@ -27,7 +27,7 @@ func initLocalConf() {
 		LogicRPCAddrs: "addrs:///127.0.0.1:50000",
 	}
 
-	// WS同学层
+	// WS通讯层
 	WSConn = WSConnConf{
 		WSListenAddr:  ":8081",
 		RPCListenAddr: ":50200",
@@ -37,7 +37,7 @@ func initLocalConf() {
 
 	// 业务层
 	Business = BusinessConf{
-		MySQL:            "root:root123@tcp(localhost:3306)/im?charset=utf8&parseTime=true",
+		MySQL:            "root:root123@tcp(localhost:3306)/gim?charset=utf8&parseTime=true",
 		NSQIP:            "127.0.0.1:4150",
 		RedisIP:          "127.0.0.1:6379",
 		RPCIntListenAddr: ":50300",

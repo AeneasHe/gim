@@ -13,11 +13,12 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// 服务器端的单向调用的拦截器
+// 服务器端的单向调用的拦截器 中间件
 func LogicIntInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 	defer gerrors.LogPanic("logic_int_interceptor", ctx, req, info, &err)
 
 	resp, err = handler(ctx, req)
+
 	logger.Logger.Debug("logic_int_interceptor", zap.Any("info", info), zap.Any("req", req), zap.Any("resp", resp), zap.Error(err))
 
 	s, _ := status.FromError(err)

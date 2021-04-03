@@ -15,8 +15,12 @@ import (
 func main() {
 	client := TcpClient{}
 	// 输入用户id，设备id
-	fmt.Println("input UserId,DeviceId,SyncSequence")
-	fmt.Scanf("%d %d %d", &client.UserId, &client.DeviceId, &client.Seq)
+	//fmt.Println("input UserId,DeviceId,SyncSequence")
+	//fmt.Scanf("%d %d %d", &client.UserId, &client.DeviceId, &client.Seq)
+	client.UserId = 2
+	client.DeviceId = 2
+	client.Seq = 1
+
 	client.Start()
 	select {}
 }
@@ -44,9 +48,13 @@ func (c *TcpClient) Start() {
 
 	c.codec = util2.NewCodec(connect)
 
+	// 客户端登录
 	c.SignIn()
+	// 同步消息
 	c.SyncTrigger()
+	// 心跳循环
 	go c.Heartbeat()
+	// 消息循环
 	go c.Receive()
 }
 

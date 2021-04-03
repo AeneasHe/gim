@@ -14,8 +14,13 @@ import (
 
 func main() {
 	client := WSClient{}
-	fmt.Println("input UserId,DeviceId,SyncSequence")
-	fmt.Scanf("%d %d %d", &client.UserId, &client.DeviceId, &client.Seq)
+	// fmt.Println("input UserId,DeviceId,SyncSequence")
+	// fmt.Scanf("%d %d %d", &client.UserId, &client.DeviceId, &client.Seq)
+
+	client.UserId = 1
+	client.DeviceId = 1
+	client.Seq = 1
+
 	client.Start()
 	select {}
 }
@@ -119,7 +124,10 @@ func (c *WSClient) HandlePackage(bytes []byte) {
 			return
 		}
 		fmt.Println("离线消息同步响应:code", output.Code, "message:", output.Message)
-		fmt.Printf("%+v \n", output)
+
+		// output是protobug编译出来的类型，含有一个state字段，用到了锁，不可以直接printf整个类型
+		//fmt.Printf("%+v \n", output)
+
 		for _, msg := range syncResp.Messages {
 			fmt.Printf("消息：发送者类型：%d 发送者id：%d  接收者类型：%d 接收者id：%d  消息内容：%+v seq：%d \n",
 				msg.Sender.SenderId, msg.Sender.SenderId, msg.ReceiverType, msg.ReceiverId, util.FormatMessage(msg.MessageType, msg.MessageContent), msg.Seq)
@@ -132,6 +140,7 @@ func (c *WSClient) HandlePackage(bytes []byte) {
 		}
 		c.Output(pb.PackageType_PT_MESSAGE, output.RequestId, &ack)
 		fmt.Println("离线消息同步结束------")
+
 	case pb.PackageType_PT_MESSAGE:
 		message := pb.MessageSend{}
 		err := proto.Unmarshal(output.Data, &message)

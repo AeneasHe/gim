@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 )
 
@@ -52,6 +53,7 @@ type BusinessConf struct {
 
 func init() {
 	env := os.Getenv("im_env")
+	fmt.Println("===>env", env)
 	switch env {
 	case "dev":
 		initDevConf()
