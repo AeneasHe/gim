@@ -1,23 +1,9 @@
-from google.protobuf import message
 import wpath
-import grpc
-import scripts.pb.conn.ext_pb2 as conn
-import scripts.pb.logic.ext_pb2 as pb
-import scripts.pb.logic.ext_pb2_grpc as pb_grpc
-import time
+from scripts.logic.base import *
 
 
-def run():
+def sendMessage():
     # 连接 rpc 服务器
-    channel = grpc.insecure_channel("127.0.0.1:50001")
-    stub = pb_grpc.LogicExtStub(channel)
-
-    metadata = [
-        ("user_id", "2"),
-        ("device_id", "2"),
-        ("token", "0"),
-        ("request_id", str(int(time.time() * 1000))),
-    ]
 
     text = conn.Text()
     text.text = b"hello gim"
@@ -31,9 +17,12 @@ def run():
     # messageReq.to_user_ids.extend([1, 2])
     # messageReq.to_user_ids[:] = [1, 2]
     messageReq.message_type = conn.MessageType.MT_TEXT
-    messageReq.message_content = text  # .encode("utf-8")
+    messageReq.message_content = content
     messageReq.send_time = 123
     messageReq.is_persist = True
+
+    stub = get_stub()
+    metadata = get_metadata()
 
     response = stub.SendMessage(messageReq, metadata=metadata)
 
@@ -41,4 +30,4 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    sendMessage()
