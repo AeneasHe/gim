@@ -13,7 +13,7 @@ type deviceDao struct{}
 
 var DeviceDao = new(deviceDao)
 
-// Insert 插入一条设备信息
+// Insert 注册设备，插入一条设备信息
 func (*deviceDao) Add(device model.Device) (int64, error) {
 	device.CreateTime = time.Now()
 	device.UpdateTime = time.Now()
@@ -24,7 +24,7 @@ func (*deviceDao) Add(device model.Device) (int64, error) {
 	return device.Id, nil
 }
 
-// Get 获取设备
+// Get 查询设备
 func (*deviceDao) Get(deviceId int64) (*model.Device, error) {
 	var device = model.Device{Id: deviceId}
 	err := db.DB.First(&device).Error

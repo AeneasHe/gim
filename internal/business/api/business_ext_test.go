@@ -63,6 +63,7 @@ func TestUserExtServer_SignIn2(t *testing.T) {
 	fmt.Printf("%+v\n", resp)
 }
 
+// 查询用户
 func TestUserExtServer_GetUser(t *testing.T) {
 	resp, err := getUserExtClient().GetUser(getCtx(), &pb.GetUserReq{UserId: 1})
 	if err != nil {

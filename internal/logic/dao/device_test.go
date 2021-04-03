@@ -10,6 +10,7 @@ func init() {
 	fmt.Println("start")
 }
 
+// 测试用Dao直接添加设备
 func TestDeviceDao_Add(t *testing.T) {
 	device := model.Device{
 		UserId:        1,
@@ -28,6 +29,7 @@ func TestDeviceDao_Get(t *testing.T) {
 	fmt.Printf("%+v\n %+v\n", device, err)
 }
 
+// 查询用户在线的设备
 func TestDeviceDao_ListOnlineByUserId(t *testing.T) {
 	devices, err := DeviceDao.ListOnlineByUserId(1)
 	fmt.Println(err)
