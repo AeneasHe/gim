@@ -50,6 +50,6 @@ func TestUserDao_Update(t *testing.T) {
 }
 
 func TestUserDao_Search(t *testing.T) {
-	users, err := UserDao.Search("哈哈哈")
+	users, err := UserDao.Search("18800002222")
 	fmt.Printf("%+v\n %+v\n ", users, err)
 }

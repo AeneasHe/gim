@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"gim/internal/logic/cache"
 	"gim/internal/logic/dao"
 	"gim/internal/logic/model"
@@ -93,7 +94,7 @@ func (*messageService) ListByUserIdAndSeq(ctx context.Context, userId, seq int64
 }
 
 // Send 消息发送
-func (s *messageService) Send(ctx context.Context, sender model.Sender, req pb.SendMessageReq) (int64, error) {
+func (s *messageService) Send(ctx context.Context, sender model.Sender, req *pb.SendMessageReq) (int64, error) {
 	// 如果发送者是用户，需要补充用户的信息
 	if sender.SenderType == pb.SenderType_ST_USER {
 		user, err := rpc.BusinessIntClient.GetUser(ctx, &pb.GetUserReq{UserId: sender.SenderId})
@@ -128,7 +129,7 @@ func (s *messageService) Send(ctx context.Context, sender model.Sender, req pb.S
 }
 
 // SendToUser 消息发送至用户
-func (*messageService) SendToFriend(ctx context.Context, sender model.Sender, req pb.SendMessageReq) (int64, error) {
+func (*messageService) SendToFriend(ctx context.Context, sender model.Sender, req *pb.SendMessageReq) (int64, error) {
 	// 发给发送者
 	seq, err := MessageService.SendToUser(ctx, sender, sender.SenderId, req)
 	if err != nil {
@@ -151,7 +152,7 @@ func (*messageService) SendToFriend(ctx context.Context, sender model.Sender, re
 }
 
 // SendToGroup 消息发送至群组（使用写扩散）
-func (*messageService) SendToGroup(ctx context.Context, sender model.Sender, req pb.SendMessageReq) (int64, error) {
+func (*messageService) SendToGroup(ctx context.Context, sender model.Sender, req *pb.SendMessageReq) (int64, error) {
 	users, err := SmallGroupUserService.GetUsers(ctx, req.ReceiverId)
 	if err != nil {
 		return 0, err
@@ -205,7 +206,7 @@ func IsInGroup(users []model.GroupUser, userId int64) bool {
 }
 
 // SendToLargeGroup 消息发送至大群组（读扩散）
-func (*messageService) SendToLargeGroup(ctx context.Context, sender model.Sender, req pb.SendMessageReq) (int64, error) {
+func (*messageService) SendToLargeGroup(ctx context.Context, sender model.Sender, req *pb.SendMessageReq) (int64, error) {
 	users, err := cache.LargeGroupUserCache.Members(req.ReceiverId)
 	if err != nil {
 		return 0, err
@@ -268,7 +269,8 @@ func (*messageService) SendToLargeGroup(ctx context.Context, sender model.Sender
 }
 
 // SendToUser 将消息发送给用户
-func (*messageService) SendToUser(ctx context.Context, sender model.Sender, toUserId int64, req pb.SendMessageReq) (int64, error) {
+func (*messageService) SendToUser(ctx context.Context, sender model.Sender, toUserId int64, req *pb.SendMessageReq) (int64, error) {
+	//记录日志
 	logger.Logger.Debug("SendToUser",
 		zap.Int64("request_id", grpclib.GetCtxRequstId(ctx)),
 		zap.Int64("to_user_id", toUserId))
@@ -276,13 +278,14 @@ func (*messageService) SendToUser(ctx context.Context, sender model.Sender, toUs
 		seq int64 = 0
 		err error
 	)
-
+	// 如果消息是持久化的
 	if req.IsPersist {
+		// 获取下一条消息的序列号
 		seq, err = SeqService.GetUserNext(ctx, toUserId)
 		if err != nil {
 			return 0, err
 		}
-
+		// 创建消息
 		selfMessage := model.Message{
 			ObjectType:   model.MessageObjectTypeUser,
 			ObjectId:     toUserId,
@@ -298,6 +301,7 @@ func (*messageService) SendToUser(ctx context.Context, sender model.Sender, toUs
 			SendTime:     util.UnunixMilliTime(req.SendTime),
 			Status:       int32(pb.MessageStatus_MS_NORMAL),
 		}
+		// 添加消息
 		err = MessageService.Add(ctx, selfMessage)
 		if err != nil {
 			logger.Sugar.Error(err)
@@ -305,6 +309,7 @@ func (*messageService) SendToUser(ctx context.Context, sender model.Sender, toUs
 		}
 	}
 
+	// 发送给用户的消息
 	message := pb.Message{
 		Sender: &pb.Sender{
 			SenderType: sender.SenderType,
@@ -330,12 +335,13 @@ func (*messageService) SendToUser(ctx context.Context, sender model.Sender, toUs
 		return 0, err
 	}
 
+	// 遍历用户的在线设备，发送消息
 	for i := range devices {
-		// 消息不需要投递给发送消息的设备
+		// 消息不需要投递给发送消息的设备（即不需要发给自己）
 		if sender.DeviceId == devices[i].Id {
 			continue
 		}
-
+		fmt.Println("正在发送消息给设备：", devices[i])
 		err = MessageService.SendToDevice(ctx, devices[i], message)
 		if err != nil {
 			logger.Sugar.Error(err, zap.Any("context canceled", devices[i]))
@@ -347,7 +353,7 @@ func (*messageService) SendToUser(ctx context.Context, sender model.Sender, toUs
 }
 
 // SendToLargeGroupUser 发送消息给大群组用户
-func (*messageService) SendToLargeGroupUser(ctx context.Context, sender model.Sender, toUserId int64, roomSeq int64, req pb.SendMessageReq) error {
+func (*messageService) SendToLargeGroupUser(ctx context.Context, sender model.Sender, toUserId int64, roomSeq int64, req *pb.SendMessageReq) error {
 	logger.Logger.Debug("SendToLargeGroupUser",
 		zap.Int64("request_id", grpclib.GetCtxRequstId(ctx)),
 		zap.Int64("to_user_id", toUserId))

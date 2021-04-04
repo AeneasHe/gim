@@ -39,6 +39,7 @@ func UserExtInterceptor(ctx context.Context, req interface{}, info *grpc.UnarySe
 	defer gerrors.LogPanic(ExtServerName, ctx, req, info, &err)
 
 	resp, err = doLogicExt(ctx, req, info, handler)
+
 	logger.Logger.Debug(ExtServerName, zap.Any("info", info), zap.Any("ctx", ctx), zap.Any("req", req),
 		zap.Any("resp", resp), zap.Error(err))
 

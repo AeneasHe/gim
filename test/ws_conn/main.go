@@ -88,7 +88,7 @@ func (c *WSClient) Heartbeat() {
 	ticker := time.NewTicker(time.Minute * 4)
 	for range ticker.C {
 		c.Output(pb.PackageType_PT_HEARTBEAT, time.Now().UnixNano(), nil)
-		fmt.Println("心跳发送")
+		fmt.Println("心跳发送<---")
 	}
 }
 
@@ -114,7 +114,7 @@ func (c *WSClient) HandlePackage(bytes []byte) {
 
 	switch output.Type {
 	case pb.PackageType_PT_HEARTBEAT:
-		fmt.Println("心跳响应")
+		fmt.Println("心跳响应--->")
 	case pb.PackageType_PT_SYNC:
 		fmt.Println("离线消息同步开始------")
 		syncResp := pb.SyncOutput{}

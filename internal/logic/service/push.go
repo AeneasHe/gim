@@ -14,27 +14,33 @@ import (
 	"go.uber.org/zap"
 )
 
+// 推送服务
 type pushService struct{}
 
 var PushService = new(pushService)
 
+// 消息推送给用户
 func (s *pushService) PushToUser(ctx context.Context, userId int64, code pb.PushCode, message proto.Message, isPersist bool) error {
+	// 记录日志
 	logger.Logger.Debug("push",
 		zap.Int64("request_id", grpclib.GetCtxRequstId(ctx)),
 		zap.Int64("user_id", userId),
 		zap.Int32("code", int32(code)),
 		zap.Any("message", message))
 
+	// 消息序列化
 	messageBuf, err := proto.Marshal(message)
 	if err != nil {
 		return gerrors.WrapError(err)
 	}
 
+	// 命令序列化
 	commandBuf, err := proto.Marshal(&pb.Command{Code: int32(code), Data: messageBuf})
 	if err != nil {
 		return gerrors.WrapError(err)
 	}
 
+	// 发送给用户
 	_, err = MessageService.SendToUser(ctx,
 		model.Sender{
 			SenderType: pb.SenderType_ST_SYSTEM,
@@ -42,7 +48,7 @@ func (s *pushService) PushToUser(ctx context.Context, userId int64, code pb.Push
 			DeviceId:   0,
 		},
 		userId,
-		pb.SendMessageReq{
+		&pb.SendMessageReq{
 			ReceiverType:   pb.ReceiverType_RT_USER,
 			ReceiverId:     userId,
 			ToUserIds:      nil,
@@ -58,6 +64,7 @@ func (s *pushService) PushToUser(ctx context.Context, userId int64, code pb.Push
 	return nil
 }
 
+// 消息推送给群
 func (s *pushService) PushToGroup(ctx context.Context, groupId int64, code pb.PushCode, message proto.Message, isPersist bool) error {
 	logger.Logger.Debug("push_to_group",
 		zap.Int64("request_id", grpclib.GetCtxRequstId(ctx)),
@@ -81,7 +88,7 @@ func (s *pushService) PushToGroup(ctx context.Context, groupId int64, code pb.Pu
 			SenderId:   0,
 			DeviceId:   0,
 		},
-		pb.SendMessageReq{
+		&pb.SendMessageReq{
 			ReceiverType:   pb.ReceiverType_RT_SMALL_GROUP,
 			ReceiverId:     groupId,
 			ToUserIds:      nil,

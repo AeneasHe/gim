@@ -22,12 +22,14 @@ var AuthService = new(authService)
 // code: 手机验证码,开发测试阶段可以任意验证码
 // deviceId: 设备id
 func (*authService) SignIn(ctx context.Context, phoneNumber, code string, deviceId int64) (bool, int64, string, error) {
+
 	// 检查手机验证码是否正确
 	if !Verify(phoneNumber, code) {
 		return false, 0, "", gerrors.ErrBadCode
 	}
 
 	// 根据手机号，从数据库中查询用户
+	fmt.Println("登录手机号:", phoneNumber)
 	user, err := dao.UserDao.GetByPhoneNumber(phoneNumber)
 	if err != nil {
 		return false, 0, "", err
@@ -105,6 +107,6 @@ func (*authService) Auth(ctx context.Context, userId, deviceId int64, token stri
 
 		return gerrors.ErrUnauthorized
 	}
-	fmt.Println("========> auth1.4")
+	fmt.Println("========> auth1.4 登录成功")
 	return nil
 }

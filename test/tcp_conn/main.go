@@ -140,7 +140,7 @@ func (c *TcpClient) HandlePackage(bytes []byte) {
 	case pb.PackageType_PT_SIGN_IN:
 		fmt.Println(Json(output))
 	case pb.PackageType_PT_HEARTBEAT:
-		fmt.Println("心跳响应")
+		fmt.Println("心跳响应--->")
 	case pb.PackageType_PT_SYNC:
 		fmt.Println("离线消息同步开始------")
 		syncResp := pb.SyncOutput{}

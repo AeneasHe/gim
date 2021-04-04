@@ -39,7 +39,7 @@ func (*LogicIntServer) SendMessage(ctx context.Context, req *pb.SendMessageReq) 
 		SenderId:   0,
 		DeviceId:   0,
 	}
-	seq, err := service.MessageService.Send(ctx, sender, *req)
+	seq, err := service.MessageService.Send(ctx, sender, req)
 	if err != nil {
 		return nil, err
 	}

@@ -13,6 +13,7 @@ type BusinessExtServer struct{}
 
 // 用户登录
 func (s *BusinessExtServer) SignIn(ctx context.Context, req *pb.SignInReq) (*pb.SignInResp, error) {
+
 	// 调用认证服务的SignIn方法，进行登录
 	isNew, userId, token, err := service.AuthService.SignIn(ctx, req.PhoneNumber, req.Code, req.DeviceId)
 	if err != nil {
@@ -53,6 +54,7 @@ func (s *BusinessExtServer) UpdateUser(ctx context.Context, req *pb.UpdateUserRe
 	})
 }
 
+// 搜索用户
 func (s *BusinessExtServer) SearchUser(ctx context.Context, req *pb.SearchUserReq) (*pb.SearchUserResp, error) {
 	users, err := dao.UserDao.Search(req.Key)
 	if err != nil {

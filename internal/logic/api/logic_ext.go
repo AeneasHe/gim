@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"gim/internal/logic/dao"
 	"gim/internal/logic/model"
 	"gim/internal/logic/service"
@@ -47,13 +48,14 @@ func (*LogicExtServer) SendMessage(ctx context.Context, in *pb.SendMessageReq) (
 		SenderId:   userId,
 		DeviceId:   deviceId,
 	}
-	seq, err := service.MessageService.Send(ctx, sender, *in)
+	seq, err := service.MessageService.Send(ctx, sender, in)
 	if err != nil {
 		return nil, err
 	}
 	return &pb.SendMessageResp{Seq: seq}, nil
 }
 
+// 添加好友
 func (s *LogicExtServer) AddFriend(ctx context.Context, in *pb.AddFriendReq) (*pb.AddFriendResp, error) {
 	userId, _, err := grpclib.GetCtxData(ctx)
 	if err != nil {
@@ -68,6 +70,7 @@ func (s *LogicExtServer) AddFriend(ctx context.Context, in *pb.AddFriendReq) (*p
 	return &pb.AddFriendResp{}, nil
 }
 
+// 同意添加好友请求
 func (s *LogicExtServer) AgreeAddFriend(ctx context.Context, in *pb.AgreeAddFriendReq) (*pb.AgreeAddFriendResp, error) {
 	userId, _, err := grpclib.GetCtxData(ctx)
 	if err != nil {
@@ -100,12 +103,14 @@ func (s *LogicExtServer) SetFriend(ctx context.Context, req *pb.SetFriendReq) (*
 	return &pb.SetFriendResp{}, nil
 }
 
+// 获取好友列表
 func (s *LogicExtServer) GetFriends(ctx context.Context, in *pb.GetFriendsReq) (*pb.GetFriendsResp, error) {
 	userId, _, err := grpclib.GetCtxData(ctx)
 	if err != nil {
 		return nil, err
 	}
 	friends, err := service.FriendService.List(ctx, userId)
+	fmt.Println("获取好友列表结果：", friends)
 	return &pb.GetFriendsResp{Friends: friends}, err
 }
 
