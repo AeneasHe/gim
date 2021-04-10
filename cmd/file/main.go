@@ -19,6 +19,7 @@ type Response struct {
 	Data    interface{} `json:"data"`
 }
 
+// 上传文件的服务
 func main() {
 	// 初始化日志
 	logger.Init()

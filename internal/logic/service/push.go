@@ -40,7 +40,7 @@ func (s *pushService) PushToUser(ctx context.Context, userId int64, code pb.Push
 		return gerrors.WrapError(err)
 	}
 
-	// 发送给用户
+	// 发送给用户，这是系统消息
 	_, err = MessageService.SendToUser(ctx,
 		model.Sender{
 			SenderType: pb.SenderType_ST_SYSTEM,

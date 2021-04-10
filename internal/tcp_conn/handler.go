@@ -26,11 +26,14 @@ type handler struct{}
 
 var Handler = new(handler)
 
+// 连接时
 func (*handler) OnConnect(c *gn.Conn) {
 	logger.Logger.Debug("connect:", zap.Int32("fd", (*c).GetFd()), zap.String("addr", (*c).GetAddr()))
 }
 
+// 新消息时
 func (h *handler) OnMessage(c *gn.Conn, bytes []byte) {
+
 	//将传输字节解析成上行消息
 	var input pb.Input
 	err := proto.Unmarshal(bytes, &input)
@@ -45,20 +48,23 @@ func (h *handler) OnMessage(c *gn.Conn, bytes []byte) {
 		return
 	}
 
+	// 根据消息类型做对应处理
 	switch input.Type {
-	case pb.PackageType_PT_SIGN_IN: //注册
-		h.SignIn(c, input)
-	case pb.PackageType_PT_SYNC: //同步
-		h.Sync(c, input)
+	case pb.PackageType_PT_SIGN_IN: //用户注册
+		h.SignIn(c, &input)
+	case pb.PackageType_PT_SYNC: //同步消息
+		h.Sync(c, &input)
 	case pb.PackageType_PT_HEARTBEAT: //心跳
-		h.Heartbeat(c, input)
+		h.Heartbeat(c, &input)
 	case pb.PackageType_PT_MESSAGE: //消息投递
-		h.MessageACK(c, input)
+		h.MessageACK(c, &input)
 	default:
 		logger.Logger.Error("handler switch other")
 	}
 	return
 }
+
+// 关闭时
 func (*handler) OnClose(c *gn.Conn, err error) {
 	logger.Logger.Debug("close", zap.String("addr", (*c).GetAddr()), zap.Int32("fd", (*c).GetFd()), zap.Any("data", (*c).GetData()), zap.Error(err))
 	if data, ok := (*c).GetData().(ConnData); ok {
@@ -70,6 +76,7 @@ func (*handler) OnClose(c *gn.Conn, err error) {
 	}
 }
 
+// 将消息发送给客户端
 func (h *handler) Send(c *gn.Conn, pt pb.PackageType, requestId int64, err error, message proto.Message) {
 	var output = pb.Output{
 		Type:      pt,
@@ -90,24 +97,25 @@ func (h *handler) Send(c *gn.Conn, pt pb.PackageType, requestId int64, err error
 		}
 		output.Data = msgBytes
 	}
+	fmt.Println("发送给客户端的消息：", output.String())
 
 	outputBytes, err := proto.Marshal(&output)
 	if err != nil {
 		logger.Sugar.Error(err)
 		return
 	}
-	fmt.Println(outputBytes)
 
 	// // 调用解码器，直接写入响应数据发送给客户端
-	// err = encoder.EncodeToFD((*c).GetFd(), outputBytes)
-	// if err != nil {
-	// 	logger.Sugar.Error(err)
-	// 	return
-	// }
+	err = encoder.EncodeToFD((*c).GetFd(), outputBytes)
+	if err != nil {
+		logger.Sugar.Error(err)
+		return
+	}
 }
 
 // SignIn 登录
-func (h *handler) SignIn(c *gn.Conn, input pb.Input) {
+func (h *handler) SignIn(c *gn.Conn, input *pb.Input) {
+	fmt.Println("长连接登录")
 	var signIn pb.SignInInput
 	err := proto.Unmarshal(input.Data, &signIn)
 	if err != nil {
@@ -136,8 +144,9 @@ func (h *handler) SignIn(c *gn.Conn, input pb.Input) {
 	(*c).SetData(data)
 }
 
-// Sync 消息同步
-func (h *handler) Sync(c *gn.Conn, input pb.Input) {
+// Sync 同步消息
+func (h *handler) Sync(c *gn.Conn, input *pb.Input) {
+	fmt.Println("========> 长连接同步消息")
 	var sync pb.SyncInput
 	err := proto.Unmarshal(input.Data, &sync)
 	if err != nil {
@@ -156,18 +165,19 @@ func (h *handler) Sync(c *gn.Conn, input pb.Input) {
 	if err == nil {
 		message = &pb.SyncOutput{Messages: resp.Messages, HasMore: resp.HasMore}
 	}
+	// 发送同步的消息
 	h.Send(c, pb.PackageType_PT_SYNC, input.RequestId, err, message)
 }
 
 // Heartbeat 心跳
-func (h *handler) Heartbeat(c *gn.Conn, input pb.Input) {
+func (h *handler) Heartbeat(c *gn.Conn, input *pb.Input) {
 	h.Send(c, pb.PackageType_PT_HEARTBEAT, input.RequestId, nil, nil)
 	data := (*c).GetData().(ConnData)
 	logger.Sugar.Infow("heartbeat", "device_id", data.DeviceId, "user_id", data.UserId)
 }
 
 // MessageACK 消息收到回执
-func (*handler) MessageACK(c *gn.Conn, input pb.Input) {
+func (*handler) MessageACK(c *gn.Conn, input *pb.Input) {
 	var messageACK pb.MessageACK
 	err := proto.Unmarshal(input.Data, &messageACK)
 	if err != nil {

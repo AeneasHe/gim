@@ -11,6 +11,7 @@ import (
 
 // StartRpcServer 启动rpc服务
 func StartRpcServer() {
+	// 先启动内部的逻辑服务器
 	go func() {
 		defer util.RecoverPanic()
 
@@ -26,6 +27,7 @@ func StartRpcServer() {
 		}
 	}()
 
+	// 然后启动外部的逻辑服务器
 	go func() {
 		defer util.RecoverPanic()
 

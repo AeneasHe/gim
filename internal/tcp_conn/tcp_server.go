@@ -14,6 +14,7 @@ var handler2 gn.Handler
 
 var encoder = gn.NewHeaderLenEncoder(2, 1024)
 
+// StartTCPServer 启动TCP长连接服务
 func StartTCPServer() {
 	// 设置日志
 	//gn.SetLogger(logger.Sugar)

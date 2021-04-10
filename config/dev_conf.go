@@ -18,7 +18,7 @@ func initDevConf() {
 		BusinessRPCAddrs: "addrs:///127.0.0.1:50300",
 	}
 	TCPConn = TCPConnConf{
-		TCPListenAddr: 8080,
+		TCPListenAddr: 8088,
 		RPCListenAddr: ":50100",
 		LocalAddr:     "127.0.0.1:50100",
 		LogicRPCAddrs: "addrs:///127.0.0.1:50000",

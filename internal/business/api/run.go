@@ -11,9 +11,10 @@ import (
 
 // StartRpcServer 启动rpc服务
 func StartRpcServer() {
+
+	// 先启动内部的业务服务器，内部指不对app提供服务，只对服务器端其他微服务提供服务
 	go func() {
 		defer util.RecoverPanic()
-
 		intListen, err := net.Listen("tcp", config.Business.RPCIntListenAddr)
 		if err != nil {
 			panic(err)
@@ -26,6 +27,7 @@ func StartRpcServer() {
 		}
 	}()
 
+	// 然后启动外部的业务服务器
 	go func() {
 		defer util.RecoverPanic()
 

@@ -9,6 +9,7 @@ import (
 	"go.uber.org/zap"
 )
 
+// 投递消息
 func DeliverMessage(ctx context.Context, req *pb.DeliverMessageReq) error {
 	// 获取设备对应的TCP连接
 	conn, ok := (*server).GetConn(int32(req.Fd))

@@ -23,7 +23,7 @@ func main() {
 		tcp_conn.StartRPCServer()
 	}()
 
-	// 初始化Rpc Client
+	// 初始化内部的逻辑客户端
 	rpc.InitLogicIntClient(config.TCPConn.LogicRPCAddrs)
 
 	// 启动长链接服务器

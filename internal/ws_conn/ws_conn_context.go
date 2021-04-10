@@ -53,8 +53,8 @@ func (c *WSConnContext) DoConn() {
 
 // HandlePackage 处理请求发包
 func (c *WSConnContext) HandlePackage(bytes []byte) {
-	var input pb.Input
-	err := proto.Unmarshal(bytes, &input)
+	var input *pb.Input
+	err := proto.Unmarshal(bytes, input)
 	if err != nil {
 		logger.Sugar.Error(err)
 		c.Release()
@@ -74,7 +74,7 @@ func (c *WSConnContext) HandlePackage(bytes []byte) {
 }
 
 // Sync 离线消息同步
-func (c *WSConnContext) Sync(input pb.Input) {
+func (c *WSConnContext) Sync(input *pb.Input) {
 	var sync pb.SyncInput
 	err := proto.Unmarshal(input.Data, &sync)
 	if err != nil {
@@ -98,13 +98,13 @@ func (c *WSConnContext) Sync(input pb.Input) {
 }
 
 // Heartbeat 心跳
-func (c *WSConnContext) Heartbeat(input pb.Input) {
+func (c *WSConnContext) Heartbeat(input *pb.Input) {
 	c.Output(pb.PackageType_PT_HEARTBEAT, input.RequestId, nil, nil)
 	logger.Sugar.Infow("heartbeat", "device_id", c.DeviceId, "user_id", c.UserId)
 }
 
 // MessageACK 消息回执
-func (c *WSConnContext) MessageACK(input pb.Input) {
+func (c *WSConnContext) MessageACK(input *pb.Input) {
 	var messageACK pb.MessageACK
 	err := proto.Unmarshal(input.Data, &messageACK)
 	if err != nil {

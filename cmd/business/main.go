@@ -15,7 +15,7 @@ func main() {
 	db.InitMysql(config.Business.MySQL)
 	db.InitRedis(config.Business.RedisIP, config.Logic.RedisPassword)
 
-	// 初始化RpcClient
+	// 初始化内部的逻辑客户端
 	rpc.InitLogicIntClient(config.Business.LogicRPCAddrs)
 
 	api.StartRpcServer()

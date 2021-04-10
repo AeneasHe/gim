@@ -16,6 +16,7 @@ var (
 	BusinessIntClient pb.BusinessIntClient
 )
 
+// 初始化内部的逻辑客户端
 func InitLogicIntClient(addr string) {
 	conn, err := grpc.DialContext(context.TODO(), addr, grpc.WithInsecure(), grpc.WithUnaryInterceptor(interceptor))
 	if err != nil {
@@ -26,6 +27,7 @@ func InitLogicIntClient(addr string) {
 	LogicIntClient = pb.NewLogicIntClient(conn)
 }
 
+// 初始化内部的连接客户端
 func InitConnIntClient(addr string) {
 	conn, err := grpc.DialContext(context.TODO(), addr, grpc.WithInsecure(), grpc.WithUnaryInterceptor(interceptor),
 		grpc.WithDefaultServiceConfig(fmt.Sprintf(`{"LoadBalancingPolicy": "%s"}`, grpclib.Name)))
@@ -37,6 +39,7 @@ func InitConnIntClient(addr string) {
 	ConnectIntClient = pb.NewConnIntClient(conn)
 }
 
+// 初始化内部的业务客户端
 func InitBusinessIntClient(addr string) {
 	conn, err := grpc.DialContext(context.TODO(), addr, grpc.WithInsecure(), grpc.WithUnaryInterceptor(interceptor))
 	if err != nil {

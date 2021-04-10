@@ -40,7 +40,7 @@ type TcpClient struct {
 
 // 客户端启动，入口
 func (c *TcpClient) Start() {
-	connect, err := net.Dial("tcp", "localhost:8080")
+	connect, err := net.Dial("tcp", "localhost:8088")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -93,6 +93,7 @@ func (c *TcpClient) SignIn() {
 	c.Output(pb.PackageType_PT_SIGN_IN, time.Now().UnixNano(), &signIn)
 }
 
+// 消息同步的信号
 func (c *TcpClient) SyncTrigger() {
 	c.Output(pb.PackageType_PT_SYNC, time.Now().UnixNano(), &pb.SyncInput{Seq: c.Seq})
 }
